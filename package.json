@@ -12,6 +12,7 @@
     "lint:css": "sass-lint Resources/Private/Styles/**/*.scss --verbose --no-exit",
     "php:codesniffer": ".Build/bin/phpcs --standard=PSR2 Classes/ Tests/ *.php",
     "php:unittests": "export TYPO3_PATH_WEB=$PWD/.Build/Web && .Build/bin/phpunit -c Tests/Build/UnitTests.xml",
+    "php:functionaltests": "export typo3DatabaseName='typo3' && export typo3DatabaseUsername='root' && export typo3DatabasePassword='' && export typo3DatabaseHost='localhost' && export TYPO3_PATH_WEB=$PWD/.Build/Web && .Build/bin/phpunit -c Tests/Build/FunctionalTests.xml",
     "build:suite": "npm run php:codesniffer && npm run php:unittests && npm run lint:css"
   },
   "dependencies": {
