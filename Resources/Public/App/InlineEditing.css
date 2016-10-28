@@ -714,7 +714,8 @@
   bottom: -45px;
   right: 0;
   background: #fff;
-  opacity: .8; }
+  opacity: .8;
+  z-index: 10; }
   .t3-frontend-editing__loading-screen .icon-spin .icon-markup {
     filter: alpha(opacity=80);
     position: absolute;
