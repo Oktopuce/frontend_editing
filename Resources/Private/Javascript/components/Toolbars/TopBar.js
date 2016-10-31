@@ -2,10 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import * as actions from '../../actions/contentActions';
+import { isEmpty } from '../../localStorage';
 
 const mapStateToProps = (state) => {
     return {
         unsavedElements: state.unsavedElements,
+        saving: state.saving
     }
 }
 
@@ -16,10 +18,14 @@ class TopBar extends React.Component {
     }
 
     discardAllChanges () {
-
+        if (!isEmpty() && confirm(FrontendEditing.labels['notifications.remove-all-changes'])) {
+            this.props.dispatch(actions.discardAllChanges());
+        }
     }
 
     render () {
+        const numberOfUnsavedElements = Object.keys(this.props.unsavedElements).length;
+        const textForNumberOfUnsavedElements = numberOfUnsavedElements  === 0 ? '' : `(${numberOfUnsavedElements})`;
         return (
             <div className="t3-frontend-editing__top-bar">
                 <div className="t3-frontend-editing__topbar-inner">
@@ -43,14 +49,14 @@ class TopBar extends React.Component {
                             </li>
                         </ul>
                         <div className="top-bar-action-buttons">
-                            <button onClick={this.saveAllChanges.bind(this)} type="submit" className="t3-frontend-editing__save btn">
+                            <button disabled={this.props.saving} onClick={this.saveAllChanges.bind(this)} type="submit" className="t3-frontend-editing__save btn">
                                 <span className="btn-text">
                                     {FrontendEditing.labels['top-bar.save-all']}
                                 </span>
-                                <span className="items-counter btn-text"></span>
+                                <span className="items-counter btn-text">{textForNumberOfUnsavedElements}</span>
                                 <span className="icons icon-icons-save"></span>
                             </button>
-                            <button onClick={this.discardAllChanges.bind(this)} type="#" className="t3-frontend-editing__discard btn-default">
+                            <button disabled={this.props.saving} onClick={this.discardAllChanges.bind(this)} type="#" className="t3-frontend-editing__discard btn-default">
                                 <span className="btn-text">
                                     {FrontendEditing.labels['top-bar.discard-all']}
                                 </span>
@@ -66,7 +72,8 @@ class TopBar extends React.Component {
 
 TopBar.propTypes = {
     dispatch: React.PropTypes.func,
-    unsavedElements: React.PropTypes.object
+    unsavedElements: React.PropTypes.object,
+    saving: React.PropTypes.bool
 };
 
 export default connect(mapStateToProps)(TopBar);

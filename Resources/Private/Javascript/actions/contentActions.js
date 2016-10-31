@@ -1,23 +1,27 @@
 import fetch from 'isomorphic-fetch';
+import * as storage from '../localStorage';
 
 const pageUrl = window.location.protocol + '//' + window.location.host;
 const functionRoutes = {
     'crud': '?type=1470741815'
 };
-const localStorageKey = 'TYPO3:FrontendEditing';
 const toastrOptions = {
     'positionClass': 'toast-top-left',
     'preventDuplicates': true
 };
 
+export const CONTENT_CHANGE = 'CONTENT_CHANGE';
 export const SAVE_CONTENT_START = 'SAVE_CONTENT_START';
+export const SAVE_CONTENT_ERROR = 'SAVE_CONTENT_ERROR';
+export const SAVE_CONTENT_SUCCESS = 'SAVE_CONTENT_SUCCESS';
+export const SAVE_CONTENT_FINISH = 'SAVE_CONTENT_FINISH';
+
 function saveContentStart() {
     return {
         type: SAVE_CONTENT_START
     };
 }
 
-export const SAVE_CONTENT_ERROR = 'SAVE_CONTENT_ERROR';
 function saveContentError(message) {
     toastr.error(
         message,
@@ -29,7 +33,6 @@ function saveContentError(message) {
     };
 }
 
-export const SAVE_CONTENT_SUCCESS = 'SAVE_CONTENT_SUCCESS';
 function saveContentSuccess(message) {
     toastr.success(
         FrontendEditing.labels['notifications.save-description'] + message,
@@ -41,22 +44,28 @@ function saveContentSuccess(message) {
     };
 }
 
-export const SAVE_CONTENT_FINISH = 'SAVE_CONTENT_FINISH';
 function saveContentFinish() {
     return {
         type: SAVE_CONTENT_FINISH,
     };
 }
 
-export const saveAllChanges = () => {
-    return function (dispatch) {
-        var items = localStorage.getItem(localStorageKey);
-        if (items !== null && items !== '') {
-            items = JSON.parse(items);
-            items = Immutable.Map(items);
+const discardAllChanges = () => {
+    storage.flush();
+    return {
+        type: CONTENT_CHANGE,
+        payload: {},
+    };
+}
 
-            let numberOfRequestsLeft = items.count();
+const saveAllChanges = () => {
+    return function (dispatch) {
+        if (!storage.isEmpty()) {
             dispatch(saveContentStart());
+
+            const items = Immutable.Map(storage.getItems());
+            let numberOfRequestsLeft = items.count();
+
             items.forEach(item => {
                 var data = {
                     'action': item.action,
@@ -82,7 +91,7 @@ export const saveAllChanges = () => {
                 .then(response => {
                     numberOfRequestsLeft--;
                     if (numberOfRequestsLeft === 0) {
-                        localStorage.removeItem(localStorageKey);
+                        storage.flush();
                         dispatch(saveContentFinish());
                     }
                     if (response.status >= 400) {
@@ -96,6 +105,7 @@ export const saveAllChanges = () => {
                 })
                 .catch(err => dispatch(saveContentError(err)));
             });
+
         } else {
             toastr.info(
                 FrontendEditing.labels['notifications.no-changes-description'],
@@ -106,3 +116,8 @@ export const saveAllChanges = () => {
 
     }
 }
+
+export {
+    discardAllChanges,
+    saveAllChanges
+};

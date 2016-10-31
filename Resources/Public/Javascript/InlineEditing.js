@@ -95,8 +95,12 @@
 					var processedSaveItems = saveItems.set(data.uid, data);
 					localStorage.setItem(localStorageKey, JSON.stringify(processedSaveItems));
 
-					// Add counter to number of unsaved elements for save button
-					$('.top-bar-action-buttons .items-counter').html('(' + processedSaveItems.count() + ')');
+					if (FrontendEditing && FrontendEditing.store) {
+						FrontendEditing.store.dispatch({
+							type: 'CONTENT_CHANGE',
+							payload: processedSaveItems.toJSON(),
+						});
+					}
 				}
 			});
 		});

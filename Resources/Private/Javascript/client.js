@@ -13,3 +13,7 @@ ReactDOM.render(
         </div>
     </Provider>, document.getElementById('t3-frontend-editing')
 );
+
+if (typeof FrontendEditing === 'object') {
+    FrontendEditing.store = store;
+}
