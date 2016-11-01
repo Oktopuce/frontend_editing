@@ -41,7 +41,6 @@
 				}
 			)
 		);
-
 		// Suppress a tags (links) to redirect the normal way
 		$('.t3-frontend-editing__iframe-wrapper iframe').contents().find('a').click(function(event) {
 			event.preventDefault();
@@ -75,6 +74,12 @@
 			});
 
 			var editor = event.editor;
+			editor.addCommand('save', {
+				exec: function( editor ) {
+					$('.t3-frontend-editing__save').trigger('click');
+				}
+			});
+
 			editor.on('change', function(changeEvent) {
 				if (typeof editor.element !== 'undefined') {
 					var dataSet = editor.element.$.dataset;

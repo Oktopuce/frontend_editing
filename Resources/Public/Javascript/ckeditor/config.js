@@ -25,7 +25,9 @@ CKEDITOR.editorConfig = function( config ) {
 		{ name: 'colors' },
 		{ name: 'about' }
 	];
-
+    config.keystrokes =[
+        [ CKEDITOR.CTRL + 83 /*S*/, 'save'],
+    ];
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Underline,Subscript,Superscript';
