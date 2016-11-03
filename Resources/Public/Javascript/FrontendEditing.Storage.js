@@ -4,6 +4,12 @@
 
     var FrontendEditing = w.FrontendEditing || {};
 
+    function getUniqueKeyForStorageBasedOnItemData(data) {
+        if (data && data.table && data.uid) {
+            return data.table + '-' + data.uid;
+        }
+    };
+
     FrontendEditing.Storage = function(storageKey) {
         this.storageKey = storageKey
 
@@ -12,8 +18,27 @@
     };
 
     FrontendEditing.Storage.prototype = {
-        addSaveItem: function (id, item) {
-            var processedItems = this.getSaveItems().set(id, item);
+        addSaveItem: function (item) {
+            var uniqueKeyForItem = getUniqueKeyForStorageBasedOnItemData(item);
+            var saveItems = this.getSaveItems();
+            var processedItems;
+
+            // Check if the item is already
+            var existingSaveItem = saveItems.get(uniqueKeyForItem);
+            if (existingSaveItem) {
+                // If the item is already added, then update the 'fields' 
+                // assuming that fields is already set if the item exists
+                existingSaveItem.fields[item.field] = item.editorInstance;
+                processedItems = saveItems.set(uniqueKeyForItem, existingSaveItem);
+            } else {
+                var fields = {};
+                fields[item.field] = item.editorInstance;
+                processedItems = saveItems.set(uniqueKeyForItem, {
+                    uid: item.uid,
+                    table: item.table,
+                    fields: fields,
+                });
+            }
             localStorage.setItem(this.storageKey, JSON.stringify(processedItems));
         },
         getSaveItems: function() {

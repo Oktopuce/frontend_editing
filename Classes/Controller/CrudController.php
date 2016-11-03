@@ -186,12 +186,6 @@ class CrudController extends ActionController
                 null,
                 'Property "table" is missing from the body!'
             );
-        } elseif (empty($body['field'])) {
-            $this->throwStatus(
-                400,
-                null,
-                'Property "field" is missing from the body!'
-            );
         } elseif (empty($body['uid'])) {
             $this->throwStatus(
                 400,
@@ -210,6 +204,7 @@ class CrudController extends ActionController
         $this->table = $body['table'];
         // If content is rendered from "css_styled_content"
         // Then find out which database field to save data into
+        /*
         if (strpos($body['field'], ' ') !== false) {
             $this->fieldConfiguration = $this->getFieldConfiguration($body['field']);
             // Get the actual database to store the data into
@@ -219,6 +214,8 @@ class CrudController extends ActionController
             // If content is rendered from "fluid_styled_content"
             $this->field = $body['field'];
         }
+        */
+
         $this->uid = $body['uid'];
         $this->record = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow('*', $this->table, 'uid=' . $this->uid);
 
@@ -255,20 +252,21 @@ class CrudController extends ActionController
             $this->createRequestMappingForUpdateAction();
 
             $htmlEntityDecode = true;
+            foreach($this->content as $field => &$content) {
+                $content = \TYPO3\CMS\FrontendEditing\Utility\Integration::rteModification(
+                    $this->table,
+                    $field,
+                    $this->uid,
+                    $GLOBALS['TSFE']->id,
+                    $content
+                );
 
-            $this->content = \TYPO3\CMS\FrontendEditing\Utility\Integration::rteModification(
-                $this->table,
-                $this->field,
-                $this->uid,
-                $GLOBALS['TSFE']->id,
-                $this->content
-            );
-
-            if ($htmlEntityDecode) {
-                $this->content = urldecode($this->content);
-                // Try to remove invalid utf-8 characters so content
-                // won't break if there are invalid characters in content
-                $this->content = iconv('UTF-8', 'UTF-8//IGNORE', $this->content);
+                if ($htmlEntityDecode) {
+                    $content = urldecode($content);
+                    // Try to remove invalid utf-8 characters so content
+                    // won't break if there are invalid characters in content
+                    $content = iconv('UTF-8', 'UTF-8//IGNORE', $content);
+                }
             }
 
             if (empty($this->table)) {
@@ -279,13 +277,7 @@ class CrudController extends ActionController
                 );
             }
 
-            $data = [
-                $this->table => [
-                    $this->uid => [
-                        $this->field => $this->content
-                    ]
-                ]
-            ];
+            $data[$this->table][$this->uid] = $this->content;
 
             $this->dataHandler->start($data, []);
             $this->dataHandler->process_datamap();

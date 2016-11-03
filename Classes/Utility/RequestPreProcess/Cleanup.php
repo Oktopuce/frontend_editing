@@ -19,7 +19,9 @@ class Cleanup implements RequestPreProcessInterface
      */
     public function preProcess(array &$request, &$finished, CrudController &$parentObject)
     {
-        $request['content'] = $this->modifyContent($request['content']);
+        foreach($request['content'] as $field => $content) {
+            $request['content'][$field] = $this->modifyContent($request['content'][$field]);
+        }
         return $request;
     }
 

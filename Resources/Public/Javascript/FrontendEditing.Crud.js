@@ -80,12 +80,14 @@
         numberOfRequestsLeft = items.count();
         items.forEach(function(item) {
             var data = {
-                'action': item.action,
-                'table': item.table,
-                'uid': item.uid,
-                'field': item.field,
-                'content': CKEDITOR.instances[item.editorInstance].getData()
+                table: item.table,
+                uid: item.uid,
+                content: {}
             };
+            for (var field in item.fields) {
+                data.content[field] = CKEDITOR.instances[item.fields[field]].getData();
+            }
+
             F.post(
                 getCrudUrl('update'), data, {
                     done: function(data) {
