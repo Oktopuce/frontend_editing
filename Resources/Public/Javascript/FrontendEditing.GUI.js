@@ -16,7 +16,7 @@
     var messageTypes = {
         OK: 'OK',
         ERROR: 'ERROR',
-        WARNING: 'WARNING',
+        WARNING: 'WARNING'
     };
 
     var toastrOptions = {
@@ -50,15 +50,15 @@
 
         F.on(F.UPDATE_CONTENT_COMPLETE, function(data) {
             showSuccess(
-                contentSaveTitleLabel,
-                data.message
+                data.message,
+                F.translate('notifications.save-title')
             );
         });
 
         F.on(F.REQUEST_ERROR, function(data) {
             showError(
                 data.message,
-                contentSaveWentWrongLabel
+                F.translate('notifications.save-went-wrong')
             );
         });
 
@@ -82,14 +82,14 @@
                 F.saveAll();
             } else {
                 showWarning(
-                    contentNoChangesTitleLabel, 
-                    contentNoChangesDescriptionLabel
+                    F.translate('notifications.no-changes-description'),
+                    F.translate('notifications.no-changes-title')
                 );
             }
         });
 
         $('.t3-frontend-editing__discard').on('click', function() {
-            if (!storage.isEmpty() && F.confirm(contentRemoveAllChangesLabel)){
+            if (!storage.isEmpty() && F.confirm(F.translate('notifications.remove-all-changes'))){
                 storage.clear();
                 F.refreshIframe();
                 F.trigger(F.CONTENT_CHANGE);
@@ -144,6 +144,8 @@
                 .removeClass('accordion-grid')
                 .addClass('accordion-list');
         });
+
+        $('.t3-frontend-editing__right-bar').stop().animate({ right: t ? 0 : -325 }, 200);
     }
 
     function loadPageIntoIframe(url, callback) {
@@ -166,7 +168,7 @@
 
     function refreshIframe() {
         loadPageIntoIframe(iframeUrl, iframeLoadedCallback);
-    };
+    }
 
     function showLoadingScreen() {
         $loadingScreen.removeClass(CLASS_HIDDEN);
@@ -176,9 +178,9 @@
         $loadingScreen.addClass(CLASS_HIDDEN);
     }
 
-    function flashMessage(type, title, message) {
+    function flashMessage(type, message, title) {
         var toastrFunction;
-        switch(type) {
+        switch (type) {
             case messageTypes.OK:
                 toastrFunction = 'success';
                 break;
@@ -194,14 +196,14 @@
         toastr[toastrFunction](message, title, toastrOptions);
     }
 
-    function showSuccess(title, message) {
-        flashMessage(messageTypes.OK, title, message);
+    function showSuccess(message, title) {
+        flashMessage(messageTypes.OK, message, title);
     }
-    function showError (title, message) {
-        flashMessage(messageTypes.ERROR, title, message);
+    function showError (message, title) {
+        flashMessage(messageTypes.ERROR, message, title);
     }
-    function showWarning (title, message) {
-        flashMessage(messageTypes.WARNING, title, message);
+    function showWarning (message, title) {
+        flashMessage(messageTypes.WARNING, message, title);
     }
 
 }(jQuery));

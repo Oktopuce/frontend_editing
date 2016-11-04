@@ -1,6 +1,6 @@
-var Editor = (function($, FE){
+var Editor = (function($){
 
-    "use strict";
+    'use strict';
 
     var editorConfig = {
         entities_latin: false,
@@ -60,7 +60,7 @@ var Editor = (function($, FE){
             });
         });
 
-        var $topBar = $('.t3-frontend-editing__top-bar')
+        var $topBar = $('.t3-frontend-editing__top-bar');
         CKEDITOR.on('instanceReady', function(event) {
 
             // @TODO: This moves the dom instances of ckeditor into the top bar
@@ -111,4 +111,4 @@ var Editor = (function($, FE){
         init: init,
     }
 
-})(jQuery, FrontendEditing);
+})(jQuery);
